@@ -29,31 +29,31 @@ struct ReservingAllocator {
     //template <class U> ReservingAllocator(ReservingAllocator<U> const&) noexcept {}
     
     pointer allocate(std::size_t n) {
-        std::cout << "allocate " << n << " bytes" << std::endl;
+        std::cout << "allocate " << n << " elements, total size: " << n*sizeof (value_type) << std::endl;
         return  static_cast<pointer>(::operator new(n*sizeof (value_type)));
     }
 
     void deallocate(pointer p, std::size_t n) noexcept {
-        std::cout << "deallocate " << n << " bytes" << std::endl;
+        std::cout << "deallocate " << n << " elements" << std::endl;
         ::operator delete(p);
     }
 };
 
-//template <typename T, typename U>
-//bool operator==(ReservingAllocator<T> const &, ReservingAllocator<U> const &) noexcept
-//{
-//    return false;
-//}
+template <typename T, typename U>
+bool operator==(ReservingAllocator<T> const &, ReservingAllocator<U> const &) noexcept
+{
+    return true;
+}
 
-//template <typename T, typename U>
-//bool operator!=(ReservingAllocator<T> const & x, ReservingAllocator<U> const & y) noexcept
-//{
-//    return !(x == y);
-//}
+template <typename T, typename U>
+bool operator!=(ReservingAllocator<T> const & x, ReservingAllocator<U> const & y) noexcept
+{
+    return !(x == y);
+}
 
 int main() {
 
-    std::map<int, int, std::less<int>, ReservingAllocator<std::pair<const int, int>>> m1;
+    std::map<int, int, std::less<int>, ReservingAllocator<std::string>> m1;
 
     m1[99] = 12;
     m1[100] = 14;
