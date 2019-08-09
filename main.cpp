@@ -1,5 +1,5 @@
 #include "lib.hpp"
-//#include <iostream>
+#include <iostream>
 #include <vector>
 #include <map>
 #include <memory>
@@ -13,11 +13,11 @@ void populate_map(MapType & map, int startKey, int numKeys, ValueFunc func)
     }
 }
 
-//template <typename MapType>
-//void print_map(const MapType & map) {
-//    for (auto & p: map)
-//        std::cout << p.first << " " << p.second << std::endl;
-//}
+template <typename MapType>
+void print_map(const MapType & map) {
+    for (auto & p: map)
+        std::cout << p.first << " " << p.second << std::endl;
+}
 
 template <typename T>
 struct ReservingAllocator {
@@ -40,10 +40,6 @@ struct ReservingAllocator {
     }
 
     size_t pool_size() const { return mPoolSize; }
-
-    //template <class U> struct rebind {typedef ReservingAllocator<U> other;};
-
-    //ReservingAllocator() noexcept {}  // not required, unless used
 
     template <class U> ReservingAllocator(ReservingAllocator<U> const& other) noexcept
         : mPoolSize(other.pool_size())
@@ -85,8 +81,8 @@ int main() {
 
     std::map<int, int, std::less<int>, ReservingAllocator<int>> m1(ReservingAllocator<int>(10));
 
-    populate_map(m1, 0, 1, [](int key){return otus::fact(key);});
-    //print_map(m1);
+    populate_map(m1, 0, 10, [](int key){return otus::fact(key);});
+    print_map(m1);
 
     return 0;
 }
