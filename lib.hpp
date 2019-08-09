@@ -27,6 +27,7 @@ struct ReservingAllocator {
     }
 
     size_t pool_size() const { return mPoolSize; }
+    size_t current_size() const { return mPool.size(); }
 
     template <class U> ReservingAllocator(ReservingAllocator<U> const& other) noexcept
         : mPoolSize(other.pool_size())
@@ -44,7 +45,7 @@ struct ReservingAllocator {
     }
 
     void deallocate(pointer /*p*/, std::size_t /*n*/) noexcept {
-
+        // Do nothing - per-element deallocation is not supported
     }
 
 private:
@@ -58,10 +59,23 @@ private:
     std::vector<T> mPool;
 };
 
-template <typename T, typename U>
-bool operator==(ReservingAllocator<T> const & a, ReservingAllocator<U> const & b) noexcept
+
+template <typename T>
+bool operator==(ReservingAllocator<T> const & a, ReservingAllocator<T> const & b) noexcept
 {
     return &a == &b;
+}
+
+template <typename T, typename U>
+bool operator==(ReservingAllocator<T> const &, ReservingAllocator<U> const &) noexcept
+{
+    return false;
+}
+
+template <typename T, typename U>
+bool operator!=(ReservingAllocator<T> const & a, ReservingAllocator<U> const & b) noexcept
+{
+    return !(a == b);
 }
 
 } // otus
