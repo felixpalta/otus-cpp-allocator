@@ -79,10 +79,16 @@ bool operator==(ReservingAllocator<T> const & a, ReservingAllocator<U> const & b
 
 int main() {
 
-    std::map<int, int, std::less<int>, ReservingAllocator<int>> m1(ReservingAllocator<int>(10));
+    {
+        std::map<int, int> map_standard_alloc;
+        populate_map(map_standard_alloc, 0, 10, otus::fact);
+    }
 
-    populate_map(m1, 0, 10, [](int key){return otus::fact(key);});
-    print_map(m1);
+    {
+        std::map<int, int, std::less<int>, ReservingAllocator<int>> map_custom_alloc(ReservingAllocator<int>(10));
+        populate_map(map_custom_alloc, 0, 10, otus::fact);
+        print_map(map_custom_alloc);
+    }
 
     return 0;
 }
