@@ -5,7 +5,7 @@
 #include <memory>
 
 template <typename MapType, typename ValueFunc>
-void PopulateMap(MapType & map, int startKey, int numKeys, ValueFunc func)
+void populate_map(MapType & map, int startKey, int numKeys, ValueFunc func)
 {
     int stopKey = startKey + numKeys;
     for (int i = startKey; i < stopKey; ++i) {
@@ -14,7 +14,7 @@ void PopulateMap(MapType & map, int startKey, int numKeys, ValueFunc func)
 }
 
 template <typename MapType>
-void PrintMap(const MapType & map) {
+void print_map(const MapType & map) {
     for (auto & p: map)
         std::cout << p.first << " " << p.second << std::endl;
 }
@@ -24,38 +24,55 @@ struct ReservingAllocator {
     using value_type = T;
     using pointer = value_type*;
 
-    ReservingAllocator(size_t poolSize)
-        : mTotalSize(poolSize)
-        , mPool(new T[poolSize])
-        , mCurrentSize(0)
+    ReservingAllocator(size_t poolSize) noexcept
+        : mPoolSize(poolSize)
     {
-
     }
+
+    ReservingAllocator(const ReservingAllocator & other)
+        : mPoolSize(other.mPoolSize)
+    {
+        if (other.mPool.capacity()) {
+            mPool.reserve(other.mPool.capacity());
+            for (const auto & a : other.mPool)
+                mPool.emplace_back(a);
+        }
+    }
+
+    size_t pool_size() const { return mPoolSize; }
 
     //template <class U> struct rebind {typedef ReservingAllocator<U> other;};
 
     //ReservingAllocator() noexcept {}  // not required, unless used
-    //template <class U> ReservingAllocator(ReservingAllocator<U> const&) noexcept {}
+
+    template <class U> ReservingAllocator(ReservingAllocator<U> const& other) noexcept
+        : mPoolSize(other.pool_size())
+    {
+    }
     
     pointer allocate(std::size_t n) {
-        //std::cout << "allocate " << n << " elements, total size: " << n*sizeof (value_type) << std::endl;
-        if (mCurrentSize + n > mTotalSize)
+        size_t oldSize = mPool.size();
+        size_t newSize = mPool.size() + n;
+        if (newSize > mPoolSize)
             throw std::bad_alloc();
-        pointer p = mPool + mCurrentSize;
-        mCurrentSize += n;
-        return p;
+        init_pool();
+        mPool.resize(newSize);
+        return &mPool[oldSize];
     }
 
-    void deallocate(pointer p, std::size_t n) noexcept {
-//        //std::cout << "deallocate " << n << " elements" << std::endl;
-//        std::free(p);
+    void deallocate(pointer /*p*/, std::size_t /*n*/) noexcept {
+
     }
 
 private:
-    const size_t mTotalSize;
-    std::unique_ptr<T[]> mPool;
-    size_t mCurrentSize;
-
+    void init_pool() {
+        if (!mPool.capacity()) {
+            mPool.reserve(mPoolSize);
+        }
+    }
+private:
+    const size_t mPoolSize;
+    std::vector<T> mPool;
 };
 
 template <typename T, typename U>
@@ -68,8 +85,8 @@ int main() {
 
     std::map<int, int, std::less<int>, ReservingAllocator<int>> m1(ReservingAllocator<int>(10));
 
-    PopulateMap(m1, 0, 10, [](int key){return otus::fact(key);});
-    PrintMap(m1);
+    populate_map(m1, 0, 1, [](int key){return otus::fact(key);});
+    print_map(m1);
 
     return 0;
 }
