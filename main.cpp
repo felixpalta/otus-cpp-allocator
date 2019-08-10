@@ -18,36 +18,45 @@ void print_map(const MapType & map) {
         std::cout << p.first << " " << p.second << std::endl;
 }
 
+template <typename Container>
+void print_container(Container & cont)
+{
+    for (const auto & val : cont) {
+        std::cout << val << std::endl;
+    }
+}
+
+template <typename Container>
+void populate_container(Container & cont, int startKey, int numKeys)
+{
+    int stopKey = startKey + numKeys;
+    for (int i = startKey; i < stopKey; ++i)
+        cont.push_back(i);
+}
+
+
 int main() {
 
     {
-        std::map<int, int> map_standard_alloc;
-        populate_map(map_standard_alloc, 0, 10, otus::fact);
+        std::map<int, int> map;
+        populate_map(map, 0, 10, otus::fact);
     }
 
     {
         std::map<int, int, std::less<int>, otus::ReservingAllocator<int>> map_custom_alloc(otus::ReservingAllocator<int>(10));
         populate_map(map_custom_alloc, 0, 10, otus::fact);
-        //print_map(map_custom_alloc);
+        print_map(map_custom_alloc);
     }
 
     {
         otus::CustomList<int> list;
-        auto it = list.push_back(666);
-        it = list.push_back(777);
-//        for (auto it = list.begin(); it != list.end(); ++it) {
-//            std::cout << *it << std::endl;
-
-//        }
-
-//        for (const auto & val : list) {
-//            std::cout << val << std::endl;
-//        }
+        populate_container(list, 0, 10);
     }
+
     {
-        otus::CustomList<int, otus::ReservingAllocator<int>> list(otus::ReservingAllocator<int>(10));
-        list.push_back(64);
-        list.push_back(99);
+        otus::CustomList<int, otus::ReservingAllocator<int>> list_custom_alloc(otus::ReservingAllocator<int>(10));
+        populate_container(list_custom_alloc, 0, 10);
+        print_container(list_custom_alloc);
     }
 
     return 0;
