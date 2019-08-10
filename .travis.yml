@@ -11,4 +11,4 @@ deploy:
     provider: script
     skip_cleanup: true
     script:
-    - true || curl -v --fail --show-error -T MUH_PROJECT-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ufelixpalta:$BINTRAY_API_KEY "https://api.bintray.com/content/felixpalta/otus-cpp-repo/MUH_PROJECT/$TRAVIS_BUILD_NUMBER/MUH_PROJECT-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=stretch;deb_component=main;deb_architecture=amd64"
+    - curl -v --fail --show-error -T allocator-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ufelixpalta:$BINTRAY_API_KEY "https://api.bintray.com/content/felixpalta/otus-cpp-repo/allocator/$TRAVIS_BUILD_NUMBER/allocator-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=stretch;deb_component=main;deb_architecture=amd64"
