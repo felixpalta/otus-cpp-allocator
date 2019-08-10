@@ -49,3 +49,15 @@ TEST(DefaultTests, AllocCopyTest) {
     ASSERT_EQ(allocPair.pool_size(), alloc.pool_size());
     ASSERT_EQ(allocPair.current_size(), 0);
 }
+
+TEST(DefaultTests, CustomListTest) {
+    otus::CustomList<int> list;
+    ASSERT_TRUE(list.empty());
+    for (int i = 0; i < 5; ++i) {
+        list.push_back(i);
+    }
+    int i = 0;
+    for (auto it = list.begin(); it != list.end(); ++it, ++i) {
+        ASSERT_EQ(*it, i);
+    }
+}
