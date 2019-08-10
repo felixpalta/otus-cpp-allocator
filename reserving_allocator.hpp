@@ -29,7 +29,10 @@ struct ReservingAllocator {
     size_t pool_size() const { return mPoolSize; }
     size_t current_size() const { return mPool.size(); }
 
-    template <class U> ReservingAllocator(ReservingAllocator<U> const& other) noexcept
+    template <typename U>
+    struct rebind { using other = ReservingAllocator<U>;};
+
+    template <typename U> ReservingAllocator(ReservingAllocator<U> const& other) noexcept
         : mPoolSize(other.pool_size())
     {
     }

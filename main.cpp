@@ -1,4 +1,5 @@
 #include "lib.hpp"
+#include "custom_list.hpp"
 #include <iostream>
 #include <map>
 
@@ -27,7 +28,26 @@ int main() {
     {
         std::map<int, int, std::less<int>, otus::ReservingAllocator<int>> map_custom_alloc(otus::ReservingAllocator<int>(10));
         populate_map(map_custom_alloc, 0, 10, otus::fact);
-        print_map(map_custom_alloc);
+        //print_map(map_custom_alloc);
+    }
+
+    {
+        otus::CustomList<int> list;
+        auto it = list.push_back(666);
+        it = list.push_back(777);
+//        for (auto it = list.begin(); it != list.end(); ++it) {
+//            std::cout << *it << std::endl;
+
+//        }
+
+//        for (const auto & val : list) {
+//            std::cout << val << std::endl;
+//        }
+    }
+    {
+        otus::CustomList<int, otus::ReservingAllocator<int>> list(otus::ReservingAllocator<int>(10));
+        list.push_back(64);
+        list.push_back(99);
     }
 
     return 0;
