@@ -11,10 +11,12 @@ class CustomList
 public:
     using value_type = T;
     using allocator_type = A;
-    CustomList(const allocator_type & a = allocator_type()) noexcept
+    CustomList(const allocator_type & a = allocator_type())
         : mAllocator(a)
         , mRootNode(nullptr)
     {}
+
+    ~CustomList();
 
     struct iterator
     {
@@ -28,7 +30,6 @@ public:
         iterator() noexcept : node(nullptr) {}
         explicit iterator(void * n) : node(n) {}
         iterator & operator++();
-        //iterator operator++(int);
         reference operator*();
         bool operator==(const iterator & other);
         bool operator!=(const iterator & other);
@@ -37,6 +38,8 @@ public:
     iterator push_back(const value_type & val);
     iterator begin();
     iterator end();
+
+    bool empty() const { return mRootNode == nullptr; }
 
 private:
     struct Node {
@@ -104,11 +107,19 @@ bool CustomList<T, A>::iterator::operator!=(const iterator &other)
     return !(*this == other);
 }
 
-//template<typename T, typename A>
-//typename CustomList<T, A>::iterator CustomList<T, A>::operator++(iterator &it, int)
-//{
-//    return ++it;
-//}
+template<typename T, typename A>
+CustomList<T,A>::~CustomList()
+{
+    if (!empty()) {
+        Node * next = mRootNode;
+        while (next) {
+            Node * prevNext = next;
+            next = prevNext->next;
+            std::allocator_traits<allocator_type_internal>::destroy(mAllocator, prevNext);
+            std::allocator_traits<allocator_type_internal>::deallocate(mAllocator, prevNext, 1);
+        }
+    }
+}
 
 } // otus
 
