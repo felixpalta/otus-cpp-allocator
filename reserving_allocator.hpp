@@ -11,36 +11,34 @@ struct ReservingAllocator {
     using value_type = T;
     using pointer = value_type*;
 
-    ReservingAllocator(size_t poolSize) noexcept
-        : mPoolSize(poolSize)
+    explicit ReservingAllocator(size_t poolSize) noexcept
+        : mMaxPoolSize(poolSize)
     {
     }
 
     ReservingAllocator(const ReservingAllocator & other)
-        : mPoolSize(other.mPoolSize)
+        : mMaxPoolSize(other.mMaxPoolSize)
     {
         if (other.mPool.capacity()) {
-            mPool.reserve(other.mPool.capacity());
-            for (const auto & a : other.mPool)
-                mPool.emplace_back(a);
+            mPool.assign(std::begin(other.mPool), std::end(other.mPool));
         }
     }
 
-    size_t pool_size() const { return mPoolSize; }
+    size_t pool_size() const { return mMaxPoolSize; }
     size_t current_size() const { return mPool.size(); }
 
     template <typename U>
     struct rebind { using other = ReservingAllocator<U>;};
 
     template <typename U> ReservingAllocator(ReservingAllocator<U> const& other) noexcept
-        : mPoolSize(other.pool_size())
+        : mMaxPoolSize(other.pool_size())
     {
     }
 
     pointer allocate(std::size_t n) {
         size_t oldSize = mPool.size();
         size_t newSize = mPool.size() + n;
-        if (newSize > mPoolSize)
+        if (newSize > mMaxPoolSize)
             throw std::bad_alloc();
         init_pool();
         mPool.resize(newSize);
@@ -54,14 +52,13 @@ struct ReservingAllocator {
 private:
     void init_pool() {
         if (!mPool.capacity()) {
-            mPool.reserve(mPoolSize);
+            mPool.reserve(mMaxPoolSize);
         }
     }
 private:
-    const size_t mPoolSize;
+    const size_t mMaxPoolSize;
     std::vector<T> mPool;
 };
-
 
 template <typename T>
 bool operator==(ReservingAllocator<T> const & a, ReservingAllocator<T> const & b) noexcept

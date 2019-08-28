@@ -11,7 +11,7 @@ class CustomList
 public:
     using value_type = T;
     using allocator_type = A;
-    CustomList(const allocator_type & a = allocator_type())
+    explicit CustomList(const allocator_type & a = allocator_type())
         : mAllocator(a)
         , mRootNode(nullptr)
     {}
@@ -52,9 +52,6 @@ private:
     using allocator_type_internal = typename allocator_type::template rebind<Node>::other;
     allocator_type_internal mAllocator;
     Node * mRootNode;
-
-    Node * allocate();
-    void deallocate(Node* node);
 };
 
 template<typename T, typename A>
